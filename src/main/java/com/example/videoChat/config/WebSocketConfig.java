@@ -20,6 +20,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     }
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(videoChatHandler(), "/socket").setAllowedOrigins("*");
+        registry.addHandler(videoChatHandler(), "/signal").setAllowedOrigins("*");
     }
 }

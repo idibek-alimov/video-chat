@@ -17,7 +17,7 @@ function leave() {
  * Prepare websocket for signaling server endpoint.
  */
 var signalingWebsocket = new WebSocket("wss://" + window.location.host +
-    "/video-conf-tutorial/signal");
+    "/signal");
  
 signalingWebsocket.onmessage = function(msg) {
     console.log("Got message", msg.data);

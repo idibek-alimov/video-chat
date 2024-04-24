@@ -32,11 +32,11 @@ public class SocketHandler extends TextWebSocketHandler{
         sessions.add(session);
     }
 
-    @Override
-    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        System.out.println(session.getId());
-        System.out.println(message.getPayload());
-        super.handleMessage(session, message);
-    }
+//    @Override
+//    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+//        System.out.println(session.getId());
+//        System.out.println(message.getPayload());
+//        super.handleMessage(session, message);
+//    }
 
 }

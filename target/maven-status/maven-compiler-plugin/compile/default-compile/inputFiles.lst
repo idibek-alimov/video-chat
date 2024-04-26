@@ -1,3 +1,5 @@
 /home/alimov/Desktop/projects/videoChat/src/main/java/com/example/videoChat/handler/SocketHandler.java
 /home/alimov/Desktop/projects/videoChat/src/main/java/com/example/videoChat/config/WebSocketConfig.java
 /home/alimov/Desktop/projects/videoChat/src/main/java/com/example/videoChat/VideoChatApplication.java
+/home/alimov/Desktop/projects/videoChat/src/main/java/com/example/videoChat/handler/NewSocketHandler.java
+/home/alimov/Desktop/projects/videoChat/src/main/java/com/example/videoChat/model/User.java

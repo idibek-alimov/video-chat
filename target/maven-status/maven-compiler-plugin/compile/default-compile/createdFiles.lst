@@ -1,3 +1,5 @@
 com/example/videoChat/VideoChatApplication.class
 com/example/videoChat/config/WebSocketConfig.class
+com/example/videoChat/model/User.class
+com/example/videoChat/config/WebSocketConfig$MyWebSocketHandler.class
 com/example/videoChat/handler/SocketHandler.class

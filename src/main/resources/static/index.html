@@ -1,39 +1,134 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-    <title>WebRTC Video Conferencing Application</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nigger dale</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<!-- Title & header of demo aplication. -->
-<div>
-    <img style="float: left; width: auto; height: 50px"
-         src="https://itsallbinary.com/wp-content/uploads/2017/03/final_itsallbinary.gif" />
-    <h3 style="position: relative; left: 10px;">WebRTC Video Conferencing <br />Application Demo
-    </h3>
+<div id="root" class="root">
+    <h1>Video Chat</h1>
+    <div>
+        <h2>Local Video</h2>
+        <video id="localVideo" autoplay playsinline muted style="width: 320px; height: 240px;"></video>
+    </div>
+    <div>
+        <h2>Remote Video</h2>
+        <video id="remoteVideo" autoplay playsinline style="width: 320px; height: 240px;"></video>
+    </div>
+
+    <button onclick="startVideoChat()">Start Video Chat</button>
 </div>
+<script>
+    let localStream;
+    let peerConnection;
+    const localVideo = document.getElementById('localVideo');
+    const remoteVideo = document.getElementById('remoteVideo');
+    const socket = new WebSocket('wss://localhost:8080/signal');
 
-<!-- Other person's camera video will show up here -->
-<div>
-    <h3 style="margin: 5px">Other Person</h3>
-    <video style="width: 50vh; height: 50vh;" id="remoteVideo"
-           poster="https://img.icons8.com/fluent/48/000000/person-male.png" autoplay></video>
-</div>
+    // Function to handle WebSocket messages
+    socket.onmessage = function(event) {
+        const message = JSON.parse(event.data);
+        switch (message.type) {
+            case 'offer':
+                handleOffer(message.offer);
+                break;
+            case 'answer':
+                handleAnswer(message.answer);
+                break;
+            case 'candidate':
+                handleCandidate(message.candidate);
+                break;
+            default:
+                console.error('Unknown message type:', message.type);
+        }
+    };
 
-<!-- Your camera video will show up here. -->
-<div>
-    <h3 style="margin: 5px">You</h3>
-    <video style="width: auto; height: 20vh;" id="localVideo"
-           poster="https://img.icons8.com/fluent/48/000000/person-male.png" autoplay muted></video>
-</div>
+    // Function to send message through WebSocket
+    function sendMessage(message) {
+        socket.send(JSON.stringify(message));
+    }
 
-<!-- Button to leave video conference. -->
-<div class="box">
-    <button id="leaveButton" style="background-color: #008CBA; color: white; ">Leave Video Conference</button>
-</div>
+    // Function to start the video chat
+    async function startVideoChat() {
+        try {
+            // Get local media stream
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localVideo.srcObject = localStream;
 
-<!--<script type="text/javascript" src="conf.js?reload=true"></script>-->
-<script src="main.js"></script>
+            // Create peer connection
+            peerConnection = new RTCPeerConnection();
 
+            // Add local stream to peer connection
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+            // Handle remote stream
+            peerConnection.ontrack = handleTrackEvent;
+
+            // Handle ICE candidates
+            peerConnection.onicecandidate = handleIceCandidateEvent;
+
+            // Create offer
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+
+            // Send offer to remote peer
+            sendMessage({ type: 'offer', offer: offer });
+        } catch (error) {
+            console.error('Error starting video chat:', error);
+        }
+    }
+
+    // Function to handle incoming offer from remote peer
+    async function handleOffer(offerMessage) {
+        try {
+            // Set remote description
+            await peerConnection.setRemoteDescription(offerMessage);
+
+            // Create answer
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+
+            // Send answer to remote peer
+            sendMessage({ type: 'answer', answer: answer });
+        } catch (error) {
+            console.error('Error handling offer from remote peer:', error);
+        }
+    }
+
+    // Function to handle incoming answer from remote peer
+    async function handleAnswer(answerMessage) {
+        try {
+            // Set remote description
+            await peerConnection.setRemoteDescription(answerMessage);
+        } catch (error) {
+            console.error('Error handling answer from remote peer:', error);
+        }
+    }
+
+    // Function to handle incoming ICE candidate from remote peer
+    function handleCandidate(candidateMessage) {
+        peerConnection.addIceCandidate(candidateMessage)
+            .catch(error => console.error('Error adding ICE candidate:', error));
+    }
+
+    // Function to handle track event
+    function handleTrackEvent(event) {
+        remoteVideo.srcObject = event.streams[0];
+    }
+
+    // Function to handle ICE candidate event
+    function handleIceCandidateEvent(event) {
+        if (event.candidate) {
+            sendMessage({ type: 'candidate', candidate: event.candidate });
+        }
+    }
+</script>
+
+{% comment %} <script type="module" src="script.mjs"></script> {% endcomment %}
 </body>
 </html>

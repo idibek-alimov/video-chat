@@ -1,6 +1,7 @@
 package com.example.videoChat.handler;
 
 import java.io.IOException;
+import java.net.http.WebSocket;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -8,18 +9,19 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import jakarta.websocket.*;
+import jakarta.websocket.server.ServerEndpoint;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-public class SocketHandler extends TextWebSocketHandler{
-    private static final Set<Session> sessions = Collections.synchronizedSet(new HashSet<>());
 
+
+public class SocketHandler extends TextWebSocketHandler{
+    private static CopyOnWriteArrayList<Session> sessions = new CopyOnWriteArrayList<>();
     @OnOpen
     public void whenOpening(Session session) throws IOException, EncodeException {
-        System.out.println("Open!");
-        // Add websocket session to a global set to use in OnMessage.
+        System.out.println("adding session");
         sessions.add(session);
     }
 
@@ -42,6 +44,9 @@ public class SocketHandler extends TextWebSocketHandler{
     public void whenClosing(Session session) {
         System.out.println("Close!");
         sessions.remove(session);
+    }
+    public void sendMessage(Session session,String message) throws IOException {
+        session.getBasicRemote().sendText(message);
     }
 //    List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 //

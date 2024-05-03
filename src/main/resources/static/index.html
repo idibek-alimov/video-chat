@@ -66,6 +66,7 @@
             // Add local stream to peer connection
             localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
+
             // Handle remote stream
             peerConnection.ontrack = handleTrackEvent;
 
@@ -127,8 +128,9 @@
             sendMessage({ type: 'candidate', candidate: event.candidate });
         }
     }
+    console.error = function(message) {
+        alert("Error: " + message);
+    };
 </script>
-
-{% comment %} <script type="module" src="script.mjs"></script> {% endcomment %}
 </body>
 </html>

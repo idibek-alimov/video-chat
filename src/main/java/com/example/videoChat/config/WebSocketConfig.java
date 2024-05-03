@@ -33,6 +33,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -44,6 +45,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new MyWebSocketHandler(), "/signal");
+
     }
 
     public static class MyWebSocketHandler extends TextWebSocketHandler {

@@ -24,6 +24,7 @@ package com.example.videoChat.config;
 //        registry.addHandler((WebSocketHandler) videoChatHandler(), "/signal").setAllowedOrigins("*");
 //    }
 //}
+import com.example.videoChat.helper.LimitedSizeList;
 import jakarta.websocket.Session;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.CloseStatus;
@@ -36,6 +37,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Configuration
@@ -49,23 +51,30 @@ public class WebSocketConfig implements WebSocketConfigurer {
     }
 
     public static class MyWebSocketHandler extends TextWebSocketHandler {
-        private static CopyOnWriteArrayList<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
+        private static LimitedSizeList<WebSocketSession> sessions = new LimitedSizeList<>(2);
         @Override
         public void afterConnectionEstablished(WebSocketSession session) throws Exception {
             // Connection opened
             System.out.println("WebSocket connection opened");
-            sessions.add(session);
+            sessions.addTheThing(session);
         }
 
         @Override
         protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
             // Message received
             System.out.println("Received message: " + message.getPayload());
-            for(WebSocketSession sess:sessions){
+            Iterator<WebSocketSession> iterator = sessions.iterator();
+            while (iterator.hasNext()){
+                WebSocketSession sess = iterator.next();
                 if(!session.equals(sess)){
                     sess.sendMessage(message);
                 }
             }
+//            for(WebSocketSession sess:this.sessions){
+//                if(!session.equals(sess)){
+//                    sess.sendMessage(message);
+//                }
+//            }
         }
 
         @Override
